@@ -1,0 +1,45 @@
+name: shop_quanao
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.4.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  provider: ^6.0.5
+  mongo_dart: ^0.10.3
+  http: ^1.2.2
+  dio: ^5.4.0
+  shared_preferences: ^2.2.2
+  intl: ^0.18.0
+  carousel_slider: ^4.0.0
+  auto_size_text: ^3.0.0
+  image_picker: ^0.8.6
+  firebase_storage: ^12.3.4
+  firebase_core: ^3.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+
+flutter:
+  uses-material-design: true
+  assets:
+  - lib/public/icons/Chat.png
+  - lib/public/icons/Edit.png
+  - lib/public/icons/Love.png
+  - lib/public/icons/Profile.png
+  - lib/public/icons/Home.png
+  - lib/public/icons/category/Adidas.png
+  - lib/public/icons/category/All.png
+  - lib/public/icons/category/Fila.png
+  - lib/public/icons/category/Nike.png
+  - lib/public/icons/category/Puna.png
+  - lib/public/imgs/Kurumi.png
+  - lib/public/assets/
