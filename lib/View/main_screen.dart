@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shop_quanao/components/bottom_navigationbar.dart';
 import 'package:shop_quanao/components/bodyWidgets/chatBody.dart';
-import 'package:shop_quanao/components/bodyWidgets/editBody.dart';
 import 'package:shop_quanao/components/bodyWidgets/homeBody.dart';
 import 'package:shop_quanao/components/bodyWidgets/loveBody.dart';
 import 'package:shop_quanao/components/bodyWidgets/profileBody.dart';
@@ -59,7 +58,6 @@ class _Main_screenState extends State<Main_screen> {
     // TODO: Move bodyItem initialization here to ensure context is available
     List<Widget> bodyItem = [
       const HomeBody(), // 0
-      editbody(), // 1
       const loveBody(), // 2
       chatbody(), // 3
       const Profilebody(), // 4
@@ -82,9 +80,8 @@ class _Main_screenState extends State<Main_screen> {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              // function
-                         
-                showSearch(context: context, delegate: CustomSearchDelegate(),);
+              // function       
+              showSearch(context: context, delegate: CustomSearchDelegate(),);
             },
           )
         ],
@@ -109,7 +106,6 @@ class _Main_screenState extends State<Main_screen> {
         onItemTapped: _onItemTapped,
       ),
 
-      // chưa dùng đến á.
     );
   }
 
@@ -124,36 +120,6 @@ class _Main_screenState extends State<Main_screen> {
     : bodyItem; // 5
   }
 
-  // chưa dùng đến á.
-  Drawer myDrawer() {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Color.fromARGB(255, 0, 136, 255),
-            ),
-            child: Expanded(
-              child: Row(
-                children: [
-                  const Icon(Icons.add),
-                  ListTile(
-                    title: const Text('Đoạn Chat'),
-                    selected: _selectedIndex == 0,
-                    onTap: () {
-                      _onItemTapped(0);
-                      Navigator.pop(context);
-                    },
-                  ),
-                  const Spacer(),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  
 
 }

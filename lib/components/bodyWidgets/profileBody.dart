@@ -24,7 +24,6 @@ class _ProfilebodyState extends State<Profilebody> {
     
     Map<String, dynamic> userMap = jsonDecode(userJson!);
     return User.fromJson(userMap);
-      return null;
   }
 
   

@@ -6,6 +6,8 @@ import 'package:shop_quanao/Model/Cart.dart';
 import 'package:shop_quanao/page/editShipmet.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_paypal/flutter_paypal.dart';
+
 
 class checkout extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
@@ -20,6 +22,74 @@ class _checkoutState extends State<checkout> {
   String newAddress = '';
   bool isLoading = false;
 
+  double vndToDolar(double money){
+    return (money * 1000) / 25000;
+  }
+  
+
+  void startPaypalCheckout(BuildContext context)async {
+    double total = vndToDolar(widget.totalPrice);
+    final List<Map<String, dynamic>> orderItem = widget.cartItems.map((item) {
+      double priceInVND = double.parse(item['price']);
+      double priceInUSD = (priceInVND * 1000) / 25000; 
+
+      print("Item: ${item['namePro']}, Price in VND: $priceInVND, Price in USD: ${priceInUSD.toStringAsFixed(2)}");
+
+      return {
+        'name': item['namePro'],
+        'price': priceInUSD.toStringAsFixed(2),
+        'quantity': item['quantity'].toString(),
+        'currency': 'USD',
+      };
+    }).toList();
+    
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => UsePaypal(
+          sandboxMode: true, 
+          clientId: "AQHFHjQZwhT-UANNsF7lyUvN8gndO5uAjuzYbhUgosNS1czcqv5NFHLJTHOt2ilIE7T-tPYkAqwVvWxD",
+          secretKey: "EObZD72d4OEKk602XtRJaO6zZ9Jfajm9x_sJm-UeSDp7SIMv9grRyhY9VfNf_ll8ymoXa3wLmEhaxVFH",
+          returnURL: "yourapp://paypal/success",
+          cancelURL: "yourapp://paypal/cancel",
+          transactions: [
+            {
+              "amount": {
+                "total": total.toStringAsFixed(2),
+                "currency": "USD",
+                "details": {
+                  "subtotal": total.toStringAsFixed(2),
+                  "shipping": '0',
+                  "shipping_discount": '0'
+                }
+              },
+              "description": "Test payment in sandbox mode.",
+              "item_list": {
+                "items": orderItem
+              }
+            }
+          ],
+          note: "If any error occur please contact for support",
+          onSuccess: (Map params) async {
+            print("Payment successful: $params");
+            await _performCheckout();
+            //Navigator.of(context).pop(); // dung cai nay thi no bi loi ko biet dc widget nao
+            _showDialog('Thanh toán thành công', 'Cảm ơn bạn đã mua hàng!'); //tam thoi de nhu v de tim ra giai phap 
+            
+          },
+          onError: (error) {
+            print("Payment error: $error");
+          },
+          onCancel: (params) {
+            print('Payment canceled: $params');
+          },
+        ),
+      ),
+    );
+  }
+
+  
+
   Future<void> _performCheckout() async {
     setState(() {
       isLoading = true;
@@ -30,9 +100,7 @@ class _checkoutState extends State<checkout> {
     final String formattedDate = DateFormat('dd/MM/yyyy HH:mm:ss').format(now);
 
     final String? username = await getUsername();
-    if(username == null){
-      print("id null");
-    }
+    
     final List<Map<String , dynamic>> orderItem = widget.cartItems.map((item) => {
       'idPro': item['id'],
       'namePro': item['namePro'],
@@ -41,7 +109,10 @@ class _checkoutState extends State<checkout> {
       'quantity': item['quantity'].toString(), 
       'color': item['color'],     
       'size': item['size'],  
+      
     }).toList();
+
+    
     
     final order = {
       'id' : "",
@@ -67,8 +138,8 @@ class _checkoutState extends State<checkout> {
     print('Response Status Code: ${response.statusCode}');
     print('Response Body: ${response.body}');
     if (response.statusCode == 200 || response.statusCode == 201) {
-      Provider.of<Cartprovider>(context, listen: false).clearCart();
-      Navigator.pop(context);
+      Provider.of<Cartprovider>(context, listen: false).clearCart(); 
+      Navigator.of(context).pop(); 
       _showDialog('Thanh toán thành công', 'Cảm ơn bạn đã mua hàng!');
     } else {
       _showDialog('Lỗi', 'Đã xảy ra lỗi khi gửi đơn hàng.');
@@ -85,8 +156,8 @@ class _checkoutState extends State<checkout> {
             TextButton(
               child: const Text('OK'),
               onPressed: () {
+                 
                 Navigator.of(context).pop();
-                
               },
             ),
           ],
@@ -189,9 +260,9 @@ class _checkoutState extends State<checkout> {
                   ),
                   
                   Image.asset(
-                    'lib/public/assets/ipay.png',
-                    width: 80,
-                    height: 80,
+                    'lib/public/assets/paypal.png',
+                    width: 50,
+                    height: 50,
                     fit: BoxFit.contain,
                     
                   ),
@@ -207,8 +278,8 @@ class _checkoutState extends State<checkout> {
                   ),
                   Image.asset(
                     'lib/public/assets/visa.png',
-                    width: 80,
-                    height: 80,
+                    width: 60,
+                    height: 60,
                     fit: BoxFit.contain,
                   ),
                   Radio <int> (
@@ -220,12 +291,9 @@ class _checkoutState extends State<checkout> {
                       });
                     },                  
                   ),
-                  Image.asset(
-                    'lib/public/assets/mastercard.jpg',
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.contain,
-                  ),
+                  const Text(
+                    "Tiền mặt", style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                  )
                 ],
               ),
               Align(
@@ -442,10 +510,14 @@ class _checkoutState extends State<checkout> {
 
                   ),
 
-
-                  onPressed: isLoading ? null: () async {
-                    // su ly thanh toan
-                    await _performCheckout();
+                  onPressed: ()async {
+                    if(selected == 1){
+                      startPaypalCheckout(context);
+                    }
+                    else if(selected == 3){
+                      await _performCheckout();
+                    }
+                    
                   },
                   
                   child: const Text("Thanh Toán"),

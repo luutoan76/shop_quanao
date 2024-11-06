@@ -160,6 +160,15 @@ class _CartPageState extends State<CartPage> {
                               const SizedBox(
                                 height: 5,
                               ),
+                              Text("Màu: ${item.color}",
+                                  style: const TextStyle(fontSize: 16)),
+                              const SizedBox(
+                                height: 5,
+                              ),Text("Size: ${item.size}",
+                                  style: const TextStyle(fontSize: 16)),
+                              const SizedBox(
+                                height: 5,
+                              ),
                               Row(
                                 children: [
                                   InkWell(
@@ -280,7 +289,7 @@ class _CartPageState extends State<CartPage> {
                         cartItems: cartProvider.items.map((item) =>{
                           'id' : item.id,
                           'quantity' : item.quantity,
-                          'totalPrice' : item.totalPrice,// not sure
+                          'totalPrice' : item.totalPrice,
                           'img': item.imageUrl,
                           'color': item.color,
                           'size' : item.size,

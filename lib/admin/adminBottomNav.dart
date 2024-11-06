@@ -1,38 +1,37 @@
 import 'package:flutter/material.dart';
 
-class CustomBottomNavigationBar extends StatelessWidget {
+class Adminbottomnav extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onItemTapped;
 
-  const CustomBottomNavigationBar({
+  const Adminbottomnav({
     required this.selectedIndex,
     required this.onItemTapped,
     super.key,
   });
 
-  Widget _buildIcon(String assetName, int index) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        if (selectedIndex == index)
-          Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-              color: Colors.amber,
-              shape: BoxShape.circle,
+    Widget _buildIcon(String assetName, int index) {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          if (selectedIndex == index)
+            Container(
+              width: 40,
+              height: 40,
+              decoration: const BoxDecoration(
+                color: Colors.amber,
+                shape: BoxShape.circle,
+              ),
             ),
+          Image.asset(
+            assetName,
+            width: 24,
+            height: 24,
+            color: selectedIndex == index ? Colors.white : Colors.grey,
           ),
-        Image.asset(
-          assetName,
-          width: 24,
-          height: 24,
-          color: selectedIndex == index ? Colors.white : Colors.grey,
-        ),
-      ],
-    );
-  }
-
+        ],
+      );
+    }
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -45,25 +44,25 @@ class CustomBottomNavigationBar extends StatelessWidget {
           items: <BottomNavigationBarItem>[
             // home = 0
             BottomNavigationBarItem(
-              icon: _buildIcon('lib/public/icons/Home.png', 0),
-              label: 'Trang Chủ',
+              icon: _buildIcon('lib/public/assets/shirt.png', 0),
+              label: 'Sản Phẩm',
             ),
             // edit = 1
             
             // love = 2
             BottomNavigationBarItem(
-              icon: _buildIcon('lib/public/icons/Love.png', 1),
-              label: 'Yêu thích',
+              icon: _buildIcon('lib/public/assets/checklist.png', 1),
+              label: 'Đơn Hàng',
             ),
             // chat = 3
             BottomNavigationBarItem(
-              icon: _buildIcon('lib/public/icons/Chat.png', 2),
-              label: 'Đánh giá',
+              icon: _buildIcon('lib/public/assets/dashboard.png', 2),
+              label: 'Dashboard',
             ),
             // profile = 4
             BottomNavigationBarItem(
-              icon: _buildIcon('lib/public/icons/Profile.png', 3),
-              label: 'Thông tin',
+              icon: _buildIcon('lib/public/assets/account.png', 3),
+              label: 'Tài Khoản',
             ),
           ],
           backgroundColor: const Color(0xFF152354),

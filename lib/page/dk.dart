@@ -1,9 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shop_quanao/page/DangNhap.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:firebase_storage/firebase_storage.dart';
 
 class Dk extends StatefulWidget {
   const Dk({super.key});
@@ -19,7 +20,7 @@ class _DkState extends State<Dk> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   String _errorMessage = "";
-
+  String? downloadURL = "";
   Future<bool> isUsernameTaken(String username) async {
     List<Map<String, dynamic>> users = await fetchUsers();
 
@@ -31,7 +32,29 @@ class _DkState extends State<Dk> {
     return false;
   }
 
+  Future<void> uploadImageToFirebase(BuildContext context) async {
+    try {
+      final ByteData byteData = await rootBundle.load('lib/public/assets/ava.jpg');
+      final Uint8List imageData = byteData.buffer.asUint8List();
+
+      const String fileName = "ava.jpg";
+      final Reference firebaseStorageRef = FirebaseStorage.instance.ref().child('user_profileAvatar/$fileName');
+
+      final UploadTask uploadTask = firebaseStorageRef.putData(imageData);
+      final TaskSnapshot snapshot = await uploadTask;
+
+      downloadURL = await snapshot.ref.getDownloadURL();
+      print('Image URL: $downloadURL');
+
+      
+    } catch (e) {
+      print('Error uploading image: $e');
+    }
+  }
+
+
   Future<bool> registerUser(String username, String password, String phonenum, String email) async {
+    await uploadImageToFirebase(context);
     const String apiUrl = 'http://10.0.2.2:5125/api/User/';
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -43,7 +66,7 @@ class _DkState extends State<Dk> {
         'phonenum':  phonenum,
         'email': email,
         'address': "",
-        'img': "https://i.pinimg.com/564x/4e/22/be/4e22beef6d94640c45a1b15f4a158b23.jpg",
+        'img': downloadURL,
         'dateBirth': "",
       }),
     );

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "839427355473",
+    "project_id": "quanaodata",
+    "storage_bucket": "quanaodata.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:839427355473:android:f2a73553d388dd31bed970",
+        "android_client_info": {
+          "package_name": "com.example.shop_quanao"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZpCPGlYibOxlsdTL9WLh0tGq2p-pyLTI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

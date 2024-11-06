@@ -1,11 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shop_quanao/Model/Cart.dart';
-import 'package:shop_quanao/page/DangNhap.dart';
+import 'package:shop_quanao/admin/Dangnhap.dart';
 import 'package:provider/provider.dart';
 
 void main()async {
-  
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(
     ChangeNotifierProvider(
       create: (context) => Cartprovider(),
@@ -25,7 +26,7 @@ class MainApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ), debugShowCheckedModeBanner: false,
-      home:  const Dangnhap(),
+      home:  const AdminLogin(),
     
     );
   }

@@ -26,6 +26,7 @@ class _UdateprofileState extends State<Udateprofile> {
   late TextEditingController dateBirthController = TextEditingController();
   late TextEditingController emailController = TextEditingController();
   DateTime? selectedDate;
+
   final ImagePicker picker = ImagePicker();
   File? imageFile;
   String downloadURL = "";
@@ -42,10 +43,19 @@ class _UdateprofileState extends State<Udateprofile> {
   }
 
   Future<void> pickImage()async{
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      imageFile = File(pickedFile!.path);
-    });
+    try {
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      
+      if (pickedFile != null) {
+        setState(() {
+          imageFile = File(pickedFile.path);
+        });
+      } else {
+        print('No image selected.');
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    }
   }
   
   
@@ -67,7 +77,10 @@ class _UdateprofileState extends State<Udateprofile> {
     const apiUrl = 'http://10.0.2.2:5125/api/User';
     print(widget.user.pass);
     if(passwordController.text == widget.user.pass){
-      
+      // mang , firebase 
+      if(downloadURL.isEmpty){
+        downloadURL = "https://i.pinimg.com/564x/4e/22/be/4e22beef6d94640c45a1b15f4a158b23.jpg";
+      }
       final userData ={
         'id': widget.user.id,
         'username': widget.user.username,
@@ -140,16 +153,26 @@ class _UdateprofileState extends State<Udateprofile> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ElevatedButton(
-                onPressed: ()async{
+              InkWell(
+                onTap: ()async {
                   await pickImage();
+                  Navigator.pop(context); 
+                  showImagePickerDialog();
                 },
-                style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(20),
-                  backgroundColor: Colors.blue,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: imageFile != null?
+                      FileImage(imageFile!)
+                      :const AssetImage('lib/public/assets/upload.png') as ImageProvider,
+                      fit: BoxFit.cover
+                    ),
+                    
+                  ),
                 ),
-                child: const Icon(Icons.photo_library, color: Colors.white),
               ),
               const SizedBox(height: 10),
               const Text('Chọn từ thư viện'),
@@ -159,14 +182,14 @@ class _UdateprofileState extends State<Udateprofile> {
             TextButton(
               onPressed: ()async {
                 if (imageFile != null) {
-                  await uploadImageToFirebase(context); // Upload image
+                  await uploadImageToFirebase(context, widget.user.img!); 
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Chưa chọn ảnh!')),
                   );
                 }
               },
-              child: const Text("Luu"),
+              child: const Text("Lưu"),
             ),
           ],
         );
@@ -174,11 +197,22 @@ class _UdateprofileState extends State<Udateprofile> {
     );
   }
 
-  Future<void> uploadImageToFirebase(BuildContext context) async {
+  Future<void> uploadImageToFirebase(BuildContext context, String oldImageUrl) async {
   try {
+    if (oldImageUrl.isNotEmpty) {
+      try {
+        final oldImageRef = FirebaseStorage.instance.refFromURL(oldImageUrl);
+        await oldImageRef.delete();
+        print("Old image deleted successfully.");
+      } catch (e) {
+        print("Error deleting old image: $e");
+      }
+    } else {
+      print("No old image to delete or invalid URL.");
+    }
     final String fileName = Path.basename(imageFile!.path);
     final Reference firebaseStorageRef =
-    FirebaseStorage.instance.ref().child('user_profile_images/$fileName');
+    FirebaseStorage.instance.ref().child('user_profileAvatar/$fileName');
 
     // Upload file
     final UploadTask uploadTask = firebaseStorageRef.putFile(imageFile!);
@@ -262,7 +296,7 @@ class _UdateprofileState extends State<Udateprofile> {
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                         ),
-                        child: imageFile != null
+                        child: imageFile != null ///image ava
                         ?Image.file(
                           File(imageFile!.path),
                           fit: BoxFit.cover,
